@@ -9,7 +9,7 @@ namespace Console_UI
     {
         static void Main(string[] args)
         {
-             CarTest();
+             //CarTest();
             //ColorManager colorManager = new ColorManager(new EfColorDal());
             //foreach (var color in colorManager.GetAll())
             //{
@@ -19,21 +19,21 @@ namespace Console_UI
             //Console.ReadLine();
         }
 
-        private static void CarTest()
-        {
-            CarManager carManager = new CarManager(new EfCarDal());
-            var result = carManager.GetCarDetails();
-            if (result.Success)
-            {
-                foreach (var car in result.Data)
-                {
-                    Console.WriteLine(+car.Id + " --> " + car.Description + " " + car.DailyPrice + " " + car.BrandName + " " + car.ColorName);
-                }
-            }
-            else
-            {
-                Console.WriteLine(result.Message);
-            }
-        }
+        //private static void CarTest()
+        //{
+        //    CarManager carManager = new CarManager(new EfCarDal());
+        //    var result = carManager.GetCarDetails();
+        //    if (result.Success)
+        //    {
+        //        foreach (var car in result.Data)
+        //        {
+        //            Console.WriteLine(+car.Id + " --> " + car.Description + " " + car.DailyPrice + " " + car.BrandName + " " + car.ColorName);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine(result.Message);
+        //    }
+        //}
     }
 }
