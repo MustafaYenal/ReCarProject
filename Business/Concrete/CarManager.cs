@@ -2,8 +2,11 @@
 using Business.BusinessAspects.Autofac;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Caching;
+using Core.Aspects.Autofac.Performance;
+using Core.Aspects.Autofac.Transaction;
 using Core.Aspects.Autofac.Validation;
-using Core.Business;
+using Core.Utilities.Business;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
@@ -28,11 +31,13 @@ namespace Business.Concrete
 
         [SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(CarValidator))]
+        [CacheRemoveAspect("ICarService.Get")]
+        [PerformanceAspect(5)]  //5 saniyeden fazla çalışırsa uyar
         public IResult Add(Car car)
         {
             IResult result = BusinessRules.Run(CheckIfBrandLimitExceded(),
                 CheckIfCarNameExist(car.Description));
-            if (result != null)
+            if (result == null)
             {
                 return result;
             }
@@ -52,11 +57,13 @@ namespace Business.Concrete
             return new SuccessResult(Messages.CarDeleted);
         }
 
+        [CacheAspect]
         public IDataResult<List<Car>> GetAll()
         {
             return new SuccessDataResult<List<Car>>(_carDal.GetAll(), Messages.CarListed);
         }
 
+        [CacheAspect]
         public IDataResult<Car> GetById(int carid)
         {
             return new SuccessDataResult<Car>(_carDal.Get(x => x.Id == carid));
@@ -80,11 +87,25 @@ namespace Business.Concrete
         {
             return new SuccessDataResult<List<Car>>(_carDal.GetAll(x => x.ColorId == colorid));
         }
-
+        
+        [ValidationAspect(typeof(CarValidator))]
+        [CacheRemoveAspect("ICarService.Get")]  //içerinde get ifadesi geçen metdoların cachelerini iptal eder.
         public IResult Update(Car car)
         {
             _carDal.Update(car);
             return new SuccessResult(Messages.CarUpdated);
+        }
+
+        [TransactionScopeAspect]
+        public IResult AddTransactionTest(Car car)
+        {
+            Add(car);
+            if (car.DailyPrice<100)
+            {
+                throw new Exception("");
+            }
+            Add(car);
+            return null;
         }
 
         private IResult CheckIfBrandLimitExceded()
@@ -115,5 +136,7 @@ namespace Business.Concrete
             }
             return new SuccessResult();
         }
+
+       
     }
 }
