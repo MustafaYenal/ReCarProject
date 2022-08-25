@@ -29,7 +29,7 @@ namespace Business.Concrete
             _brandService = brandService;
         }
 
-        [SecuredOperation("product.add,admin")]
+        //[SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(CarValidator))]
         [CacheRemoveAspect("ICarService.Get")]
         [PerformanceAspect(5)]  //5 saniyeden fazla çalışırsa uyar
@@ -71,10 +71,10 @@ namespace Business.Concrete
 
         public IDataResult<List<CarDetailDto>> GetCarDetails()
         {
-            if (DateTime.Now.Hour == 16)
-            {
-                return new ErrorDataResult<List<CarDetailDto>>(Messages.MaintenanceTime);
-            }
+            //if (DateTime.Now.Hour == 16)
+            //{
+            //    return new ErrorDataResult<List<CarDetailDto>>(Messages.MaintenanceTime);
+            //}
             return new SuccessDataResult<List<CarDetailDto>>(_carDal.GetCarDetails(), Messages.CarDetailList);
         }
 
@@ -107,6 +107,17 @@ namespace Business.Concrete
             Add(car);
             return null;
         }
+
+        public IDataResult<List<CarDetailDto>> GetCarDetailByBrandId(int id)
+        {
+            return new SuccessDataResult<List<CarDetailDto>>(_carDal.GetCarDetails(x=>x.BrandId==id), Messages.CarDetailList);
+        }
+
+        public IDataResult<List<CarDetailDto>> GetCarDetailByColorId(int id)
+        {
+            return new SuccessDataResult<List<CarDetailDto>>(_carDal.GetCarDetails(c => c.ColorId == id), Messages.CarDetailList);
+        }
+
 
         private IResult CheckIfBrandLimitExceded()
         {
